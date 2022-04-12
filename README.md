@@ -58,16 +58,22 @@ A Lex bot that which takes user inputs on what stock market sector they want to 
 ## Contributors:
 
 ### Development Team
-Leigh Badua
-John Batarse
-Catherine Croft
-Jing Pu
-Jason Rossi
+Leigh Badua,
+
+John Batarse,
+
+Catherine Croft,
+
+Jing Pu,
+
+Jason Rossi,
+
 Lari Rupp
 
 
 ### Collaborators
-University of California Berkelely Fintech Bootcamp (Project 2, 2022)
+University of California Berkelely Fintech Bootcamp (Project 2, 2022),
+
 Kevin Lee
 
 
@@ -81,4 +87,4 @@ This is a truly open-source project under the Creative Commons Zero license whic
 
 We ask that you please credit the team with the following IEEE citation:
 
-> L. Badua, J. Batarse, C. Croft, J. Pu, J. Rossi, L. Rupp, “Machine_Learning_Algorithmic_Trading_Bot,” University of California Berkeley Extension Fintech Bootcamp, Berkeley, California, USA, Fintech Bootcamp Project 2, 2022.
+> L. Badua, J. Batarse, C. Croft, J. Pu, J. Rossi, L. Rupp, “Machine_Learning_Algorithmic_Trading_Bot,” University of California Berkeley Extension Fintech Bootcamp, Berkeley, California, USA, Fintech Bootcamp Project 2, 2022. https://github.com/lariannrupp/Machine_Learning_Algorithmic_Trading_Bot (accessed month day, year).
