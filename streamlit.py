@@ -407,7 +407,7 @@ def main():
 
     valid_indicator_names = valid_indicators.keys()
     
-    selected_stock = st.sidebar.text_input("Chose a stock:", value="spy")
+    selected_stock = st.sidebar.text_input("Choose a stock:", value="SPY")
     named_selected_indicators = st.sidebar.multiselect("TA Indicators to use:", valid_indicator_names)
 
     selected_indicators = []
