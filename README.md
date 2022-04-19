@@ -4,6 +4,8 @@
 ---
 # Machine_Learning_Algorithmic_Trading_Bot
 
+**LAUNCH APP**: https://share.streamlit.io/lariannrupp/machine_learning_algorithmic_trading_bot/main/streamlit.py
+
 ---
 ## User Story: 
 
