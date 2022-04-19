@@ -254,7 +254,7 @@ def executeSVMModel(X_train_scaled, X_test_scaled, y_train, y_test, signals_df )
     model = svm.SVC()
     model = model.fit(X_train_scaled, y_train)
     pred = model.predict(X_test_scaled)
-    testing_report = classification_report(y_test, pred)
+    testing_report = classification_report(y_test, pred, output_dict=True)
 
     #st.write(X_test_scaled)
     #if len(np.unique(pred)) == 1:
@@ -291,7 +291,7 @@ def executeRandomForest(X_train_scaled, X_test_scaled, y_train, y_test, signals_
     rf_model = RandomForestClassifier()
     rf_model = rf_model.fit(X_train_scaled, y_train)
     pred = rf_model.predict(X_test_scaled)
-    testing_report = classification_report(y_test, pred)
+    testing_report = classification_report(y_test, pred, output_dict=True)
 
     predictions_df = pd.DataFrame(index=y_test.index)
     # Add the SVM model predictions to the DataFrame
@@ -321,7 +321,7 @@ def executeNaiveBayes(X_train_scaled, X_test_scaled, y_train, y_test, signals_df
     model = GaussianNB()
     model = model.fit(X_train_scaled, y_train)
     pred = model.predict(X_test_scaled)
-    report = classification_report(y_test, pred)
+    report = classification_report(y_test, pred, output_dict=True)
 
     predictions_df = pd.DataFrame(index=y_test.index)
     # Add the SVM model predictions to the DataFrame
@@ -449,7 +449,15 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
         st.write(f"Results for: {perm_key}")
         st.line_chart(all_permutations_result_map[perm_key])
    
-            
+   # Display classification report
+    with st.expander("Classification Report Comparison"):
+        st.write('SVM Report')
+        st.table(pd.DataFrame(svm_testing_report))
+        st.write('RandomForest Report')
+        st.table(pd.DataFrame(rf_testing_report))
+        st.write('Naive Bayes')
+        st.table(pd.DataFrame(nb_testing_report))
+
 def main():
     """
     Main function of this app. Sets up the side bar and then exectues the rest of the code.
