@@ -348,6 +348,12 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
   
     """
 
+    # define percentage calculation for columns 
+    def percent_column(model, actual):
+        a = (model - actual) * 100
+        results = ("{:.0f}%".format(a))
+        return results
+
     # Getting the stock data
     ohlcv_df = getYahooStockData(ticker.upper(), years)
 
@@ -372,7 +378,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
     st.write(f"Testing {len(ta_func_combinations)} different combinations of these indicators: ", ", ".join(names))
     
     # this is prepping the final results df    
-    top_ten_results_df = pd.DataFrame(columns=["Variation", "SVM Returns", "Random Forest Returns", "Naive Bayes Returns"])
+    top_ten_results_df = pd.DataFrame(columns=["Variation", "SVM Returns", f"SVM vs. {ticker}", "Random Forest Returns", f"RF vs. {ticker}", "Naive Bayes Returns", f"NB vs. {ticker}" ])
 
     # all of the results dfs should be stored in this map for future reference
     all_combinations_result_map = {}
@@ -421,17 +427,19 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
        
         _key = ",".join([flipped_finta_map[n] for n in ta_func_permutation])
 
+        # fixme - it's lame to have to reset this every iteration
+        actual_returns_for_period = svm_final_df.iloc[-1]["Actual Returns"]
+
         # now that all of the results are in a single dataframe, we're storing the merged_df in a map so that
         # it could possibly be referenced later to display the chart later.
         all_combinations_result_map[_key] = merged_df        
 
         # the next 3 lines is a way to manually add a row to a dataframe
-        top_ten_results_df.loc[-1] = [_key, svm_final_return, rf_final_return, nb_final_return]
+        top_ten_results_df.loc[-1] = [_key, svm_final_return, percent_column(svm_final_return, actual_returns_for_period), rf_final_return, percent_column(rf_final_return, actual_returns_for_period), nb_final_return, percent_column(nb_final_return, actual_returns_for_period)]
         top_ten_results_df.index = top_ten_results_df.index + 1
         top_ten_results_df = top_ten_results_df.sort_index()
 
-        # fixme - it's lame to have to reset this every iteration
-        actual_returns_for_period = svm_final_df.iloc[-1]["Actual Returns"]
+       
 
     top_ten_results_df = top_ten_results_df.sort_values(by=["SVM Returns", "Random Forest Returns", "Naive Bayes Returns"], ascending=False)
 
