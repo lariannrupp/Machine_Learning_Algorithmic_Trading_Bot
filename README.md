@@ -1,5 +1,4 @@
-![Board-Machine-Learning-By-Machine-Head-Algorithm-4519964](https://user-images.githubusercontent.com/95719899/162881769-863fc571-f048-41e8-b532-a99e877336b1.jpg)
-
+![Boom-Bull-Stock-Exchange-Bear-World-Economy-913982](https://user-images.githubusercontent.com/95719899/164332595-9cf0e024-aab1-4d3b-a11c-8c47ee122b9e.jpg)
 
 ---
 # Machine_Learning_Algorithmic_Trading_Bot
@@ -7,49 +6,72 @@
 **LAUNCH APP**: https://share.streamlit.io/lariannrupp/machine_learning_algorithmic_trading_bot/main/streamlit.py
 
 ---
-## User Story: 
+## Purpose: 
 
-A non-technical user can choose which stock sector they want to invest in, be presented with a prepackaged machine learning model, and deploy the trading bot to their Alpaca trading account
+Before starting their algorithmic trading project or purchasing a trading bot from an online marketplace, a user can launch this app to select a stock and compare machine learning models and technical indicators in a generic testing environment. 
 
 ---
 
+## Technologies
+
+A Python 3.9.7 (ipykernal) was used to write this app.
+
+![python-logo-master-v3-TM-flattened](https://user-images.githubusercontent.com/95719899/164334658-d32c6762-b35d-4ae3-8d87-f054388941e7.png)
+![Pandas_logo svg](https://user-images.githubusercontent.com/95719899/164334292-8243632d-1274-4c4f-ba36-cbf71dc14309.png)
+![YahooFinance](https://user-images.githubusercontent.com/95719899/164334383-5f613f77-fb14-4b8c-80a7-882241baf76a.png)
+![1200px-Finta_Logo](https://user-images.githubusercontent.com/95719899/164334464-705a5167-9385-4f93-91b4-5afc74a0ea24.png)
+![1200px-Scikit_learn_logo_small svg](https://user-images.githubusercontent.com/95719899/164334470-dac38a18-1d42-4bfe-abfe-7f681677a8ff.png)
+![streamlit_logo](https://user-images.githubusercontent.com/95719899/164334479-b14755bc-7525-4f9b-aeaf-6e56df94f49d.png)
+
+--- 
+
+## Installation Guide
+
+The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README. 
+
+---
+
+## Data
+
+10 years of OHLVC (open, high, low, volume, close) stock data is pulled from the Yahoo Finance API. 
+
+The data undergoes a standard train, fit, predit process with the training window being 6 years, and the testing window being 4 years. 
+
+By default, the app scales X feature with StandardScaler(), but within the app, the user can test out different data scaling methods. 
+
+---
+
+## Selected Machine Learning Models
+
+The following machine learning models were selected because they are common, supervised models with binary classification systems:
+
+- SVM (Support Vector Machine)
+
+- Random Forest
+
+- Naive Bayes
+
+- AdaBoost 
+
+- Decision Tree
+
+---
+
+## Approach
+
+The user can test combinations of up to 5 technical indicators. Of the 31 possible combinations, the top 10 are displayed. 
+
+For users who would like to explore random combinations of 5 indicators, they can use the **I'm feeling lucky** button. 
+
+The **Re-run Last** button allows the user the rerun the app observe how the random forest model performs with each iteration.
+
+---
+
+## Backtesting and Performance Evaluation
+
+
 ## Method:
 
-### Part 1 - Create a stable machine-learning framework for the trading bots
-
-1. Create a baseline scikit-learn machine learning algorithm that pulls live pricing data from Alpaca API
-
-
-2. Duplicate the algorithm with stocks from different market sectors
-
-
-3. Perform backtesting analysis on the baseline models 
-
-
-
-### Part 2 - Produce a set of trading bots that are trained to their market sectors and deploy one to the Alpaca trading environment
-
-
-4. Optimize each model based on their unique market sector conditions
-
-
-5. Perform backtesting analysis on the optimized models
-
-
-6. Deploy a model into the Alpaca environment so it becomes a live trading bot
-
-
-
-### Part 3 Visualize the data for a user and give user instruction for deploying a trading bot
-
-
-7. Create a streamlit app that presents the results of the backtesting analyses
-
-
-8. Within the streamlit app, provide user instructions for deploying the prepackaged market sector trading bot to the Alpaca environment
-
-
-9. Within the streamlit app, provide user instructions for how to change the ticker of their prepackaged market sector trading bots
 
 Method Next steps:
 
