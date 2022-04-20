@@ -26,6 +26,7 @@ import time
 import itertools
 import random
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from functools import reduce
 from finta_map import finta_map
@@ -304,6 +305,37 @@ def executeRandomForest(X_train_scaled, X_test_scaled, y_train, y_test, signals_
     predictions_df['Strategy Returns'] = (predictions_df['Actual Returns'] * predictions_df['Predicted'])
     return predictions_df, testing_report
 
+def executeAdaBoostClassifier(X_train_scaled, X_test_scaled, y_train, y_test, signals_df):
+    """
+    executs the AdaBoost Classifier on the data provided
+
+    Args:
+        X_train_scaled: scaled training dataset
+        X_test_scaled: scaled test dataset
+        y_train: scaned training dataset
+        y_test: scaled test dataset
+        signals_df: signals df for the 'actual returns' col and index
+    Return:
+        tuple(predictions_df, testing_report)
+    """
+    #ad_model = AdaBoostClassifier(n_estimators=100)
+    ad_model = AdaBoostClassifier()
+    ad_model = ad_model.fit(X_train_scaled, y_train)
+    pred = ad_model.predict(X_test_scaled)
+    testing_report = classification_report(y_test, pred, output_dict=True)
+
+    predictions_df = pd.DataFrame(index=y_test.index)
+
+    # Add the AdaBoost model predictions to the DataFrame
+    predictions_df['Predicted'] = pred
+
+    # Add the actual returns to the DataFrame
+    predictions_df['Actual Returns'] = signals_df['Actual Returns']
+
+    # Add the strategy returns to the DataFrame
+    predictions_df['Strategy Returns'] = (predictions_df['Actual Returns'] * predictions_df['Predicted'])
+    return predictions_df, testing_report
+
 def executeNaiveBayes(X_train_scaled, X_test_scaled, y_train, y_test, signals_df):
     """
     executs the naive bayes on the data provided
@@ -378,7 +410,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
     st.write(f"Testing {len(ta_func_combinations)} different combinations of these indicators: ", ", ".join(names))
     
     # this is prepping the final results df    
-    top_ten_results_df = pd.DataFrame(columns=["Variation", "SVM Returns", f"SVM vs. {ticker}", "Random Forest Returns", f"RF vs. {ticker}", "Naive Bayes Returns", f"NB vs. {ticker}" ])
+    top_ten_results_df = pd.DataFrame(columns=["Variation", "SVM Returns", f"SVM vs. {ticker}", "Random Forest Returns", f"RF vs. {ticker}", "AdaBoost Returns", f"AD vs. {ticker}", "Naive Bayes Returns", f"NB vs. {ticker}" ])
 
     # all of the results dfs should be stored in this map for future reference
     all_combinations_result_map = {}
@@ -406,26 +438,31 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
 
         svm_predictions_df, svm_testing_report = executeSVMModel(X_train_scaled, X_test_scaled, y_train, y_test, signals_df)
         rf_predictions_df, rf_testing_report = executeRandomForest(X_train_scaled, X_test_scaled, y_train, y_test, signals_df)
+        ad_predictions_df, ad_testing_report = executeAdaBoostClassifier(X_train_scaled, X_test_scaled, y_train, y_test,signals_df)
         nb_predictions_df, nb_testing_report = executeNaiveBayes(X_train_scaled, X_test_scaled, y_train, y_test,signals_df)
 
         svm_final_df = (1 + svm_predictions_df[['Actual Returns', 'Strategy Returns']]).cumprod()
         rf_final_df = (1 + rf_predictions_df[['Actual Returns', 'Strategy Returns']]).cumprod()    
+        ad_final_df = (1 + ad_predictions_df[['Actual Returns', 'Strategy Returns']]).cumprod()    
         nb_final_df = (1 + nb_predictions_df[['Actual Returns', 'Strategy Returns']]).cumprod()
         
         # at this point we have all of our results. This next bit is a way to rename the different cols
         # and then merge them into a single dataframe which we can use to chart later in the results.
         rf_final_df.drop(columns=['Actual Returns'], inplace=True)
+        ad_final_df.drop(columns=['Actual Returns'], inplace=True)
         nb_final_df.drop(columns=['Actual Returns'], inplace=True)
 
         svm_final_return = svm_final_df.iloc[-1]["Strategy Returns"]
         rf_final_return = rf_final_df.iloc[-1]["Strategy Returns"]
+        ad_final_return = ad_final_df.iloc[-1]["Strategy Returns"]
         nb_final_return = nb_final_df.iloc[-1]["Strategy Returns"]
 
         svm_final_df.rename(columns={'Strategy Returns': 'SVM Returns'}, inplace=True)
         rf_final_df.rename(columns={'Strategy Returns': 'Random Forest Returns'}, inplace=True)
+        ad_final_df.rename(columns={'Strategy Returns': 'AdaBoost Returns'}, inplace=True)
         nb_final_df.rename(columns={'Strategy Returns': 'Naive Bayes Returns'}, inplace=True)        
 
-        dfs_to_merge = [svm_final_df, rf_final_df, nb_final_df]
+        dfs_to_merge = [svm_final_df, rf_final_df,  ad_final_df, nb_final_df]
         merged_df = reduce(lambda left,right: pd.merge(left,right,left_index=True, right_index=True), dfs_to_merge)
        
         _key = ",".join([flipped_finta_map[n] for n in ta_func_permutation])
@@ -437,15 +474,20 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
         # it could possibly be referenced later to display the chart later.
         all_combinations_result_map[_key] = merged_df        
         
-        classification_report_result_map[_key] = [svm_testing_report, rf_testing_report, nb_testing_report]
+        classification_report_result_map[_key] = [svm_testing_report, rf_testing_report, nb_testing_report, ad_testing_report]
+
         # the next 3 lines is a way to manually add a row to a dataframe
-        top_ten_results_df.loc[-1] = [_key, svm_final_return, percent_column(svm_final_return, actual_returns_for_period), rf_final_return, percent_column(rf_final_return, actual_returns_for_period), nb_final_return, percent_column(nb_final_return, actual_returns_for_period)]
+        top_ten_results_df.loc[-1] = [_key,
+        svm_final_return, percent_column(svm_final_return, actual_returns_for_period), 
+        rf_final_return, percent_column(rf_final_return, actual_returns_for_period),  
+        ad_final_return, percent_column(ad_final_return, actual_returns_for_period),
+        nb_final_return, percent_column(nb_final_return, actual_returns_for_period)]
+
         top_ten_results_df.index = top_ten_results_df.index + 1
         top_ten_results_df = top_ten_results_df.sort_index()
 
        
-
-    top_ten_results_df = top_ten_results_df.sort_values(by=["SVM Returns", "Random Forest Returns", "Naive Bayes Returns"], ascending=False)
+    top_ten_results_df = top_ten_results_df.sort_values(by=["SVM Returns", "Random Forest Returns", "AdaBoost Returns", "Naive Bayes Returns"], ascending=False)
 
     st.write(f"Return for {ticker} over the testing period is {round(actual_returns_for_period,4)}")
     st.write("Top 10 Models:")
@@ -466,8 +508,10 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
             st.table(pd.DataFrame(classification_report_result_map[perm_key][0]))
             st.write('RandomForest Report')
             st.table(pd.DataFrame(classification_report_result_map[perm_key][1]))
-            st.write('Naive Bayes')
+            st.write('AdaBoost Report')
             st.table(pd.DataFrame(classification_report_result_map[perm_key][2]))
+            st.write('Naive Bayes Report')
+            st.table(pd.DataFrame(classification_report_result_map[perm_key][3]))
 
 
 def main():
