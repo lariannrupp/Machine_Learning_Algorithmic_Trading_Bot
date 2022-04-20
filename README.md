@@ -10,20 +10,9 @@
 
 Before starting their algorithmic trading project or purchasing a trading bot from an online marketplace, a user can launch this app to select a stock and compare machine learning models and technical indicators in a generic testing environment. 
 
+
+
 ---
-
-## Technologies
-
-A Python 3.9.7 (ipykernal) was used to write this app.
-
-![python-logo-master-v3-TM-flattened](https://user-images.githubusercontent.com/95719899/164334658-d32c6762-b35d-4ae3-8d87-f054388941e7.png)
-![Pandas_logo svg](https://user-images.githubusercontent.com/95719899/164334292-8243632d-1274-4c4f-ba36-cbf71dc14309.png)
-![YahooFinance](https://user-images.githubusercontent.com/95719899/164334383-5f613f77-fb14-4b8c-80a7-882241baf76a.png)
-![1200px-Finta_Logo](https://user-images.githubusercontent.com/95719899/164334464-705a5167-9385-4f93-91b4-5afc74a0ea24.png)
-![1200px-Scikit_learn_logo_small svg](https://user-images.githubusercontent.com/95719899/164334470-dac38a18-1d42-4bfe-abfe-7f681677a8ff.png)
-![streamlit_logo](https://user-images.githubusercontent.com/95719899/164334479-b14755bc-7525-4f9b-aeaf-6e56df94f49d.png)
-
---- 
 
 ## Installation Guide
 
@@ -63,34 +52,38 @@ The user can test combinations of up to 5 technical indicators. Of the 31 possib
 
 For users who would like to explore random combinations of 5 indicators, they can use the **I'm feeling lucky** button. 
 
-The **Re-run Last** button allows the user the rerun the app observe how the random forest model performs with each iteration.
+The **Re-run last** button allows the user the rerun the app observe how the random forest model performs with each iteration.
+
 
 ---
 
-## Backtesting and Performance Evaluation
+## Performance Evaluation and Backtesting
+
+Cumulative return plots compare model performance to market performance. Additionally, the table for "Top 10 Models" compares cumulative returns as both a ratio and a percentage. 
 
 
-## Method:
+![Screenshot 2022-04-20 171355](https://user-images.githubusercontent.com/95719899/164341560-ee00d663-34b1-4df4-81a2-f6c466ac306f.jpg)
 
 
-Method Next steps:
 
-A Lex bot that which takes user inputs on what stock market sector they want to invest in and recommends one of the prepackaged machine learning models as well as interpretable backtesting results and instructions on how to deploy the model to the Alpaca environment.
+To backtest the models and compare trade accuracies, the user can drop down the **Classification Report Comparison** button. Please note that trade accuracies can oftentimes be a better metric of model performance than cumulative returns. 
+
+![Screenshot 2022-04-20 171609](https://user-images.githubusercontent.com/95719899/164341569-c4fedbb2-2749-48a9-b6b7-c4e8433a484f.jpg)
 
 ---
 
 ## Contributors:
 
 ### Development Team
-Leigh Badua,
+Leigh Badua
 
-John Batarse,
+John Batarse
 
-Catherine Croft,
+Catherine Croft
 
-Jing Pu,
+Jing Pu
 
-Jason Rossi,
+Jason Rossi
 
 Lari Rupp
 
@@ -98,7 +91,23 @@ Lari Rupp
 ### Collaborators
 University of California Berkelely Fintech Bootcamp (Project 2, 2022),
 
-Kevin Lee
+Kevin Lee (Instructor)
+
+Vincent Lin (TA)
+
+---
+
+
+## Technologies
+
+A Python 3.9.7 (ipykernal) was used to write this app.
+
+![python-logo-master-v3-TM-flattened](https://user-images.githubusercontent.com/95719899/164334658-d32c6762-b35d-4ae3-8d87-f054388941e7.png)
+![Pandas_logo svg](https://user-images.githubusercontent.com/95719899/164334292-8243632d-1274-4c4f-ba36-cbf71dc14309.png)
+![YahooFinance](https://user-images.githubusercontent.com/95719899/164334383-5f613f77-fb14-4b8c-80a7-882241baf76a.png)
+![1200px-Finta_Logo](https://user-images.githubusercontent.com/95719899/164334464-705a5167-9385-4f93-91b4-5afc74a0ea24.png)
+![1200px-Scikit_learn_logo_small svg](https://user-images.githubusercontent.com/95719899/164334470-dac38a18-1d42-4bfe-abfe-7f681677a8ff.png)
+![streamlit_logo](https://user-images.githubusercontent.com/95719899/164334479-b14755bc-7525-4f9b-aeaf-6e56df94f49d.png)
 
 
 ---
