@@ -383,6 +383,9 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
     # all of the results dfs should be stored in this map for future reference
     all_combinations_result_map = {}
 
+
+    classification_report_result_map = {}
+
     # this is really important. some of the finta functions 
     # take a long time. having a cache really speeds it up
     finta_cache = {}
@@ -433,7 +436,8 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
         # now that all of the results are in a single dataframe, we're storing the merged_df in a map so that
         # it could possibly be referenced later to display the chart later.
         all_combinations_result_map[_key] = merged_df        
-
+        
+        classification_report_result_map[_key] = [svm_testing_report, rf_testing_report, nb_testing_report]
         # the next 3 lines is a way to manually add a row to a dataframe
         top_ten_results_df.loc[-1] = [_key, svm_final_return, percent_column(svm_final_return, actual_returns_for_period), rf_final_return, percent_column(rf_final_return, actual_returns_for_period), nb_final_return, percent_column(nb_final_return, actual_returns_for_period)]
         top_ten_results_df.index = top_ten_results_df.index + 1
@@ -456,15 +460,15 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
     for perm_key in top_ten_results_df["Variation"][:10]:
         st.write(f"Results for: {perm_key}")
         st.line_chart(all_combinations_result_map[perm_key])
-   
-   # Display classification report
-    with st.expander("Classification Report Comparison"):
-        st.write('SVM Report')
-        st.table(pd.DataFrame(svm_testing_report))
-        st.write('RandomForest Report')
-        st.table(pd.DataFrame(rf_testing_report))
-        st.write('Naive Bayes')
-        st.table(pd.DataFrame(nb_testing_report))
+        # Display classification report
+        with st.expander("Classification Report Comparison"):
+            st.write('SVM Report')
+            st.table(pd.DataFrame(classification_report_result_map[perm_key][0]))
+            st.write('RandomForest Report')
+            st.table(pd.DataFrame(classification_report_result_map[perm_key][1]))
+            st.write('Naive Bayes')
+            st.table(pd.DataFrame(classification_report_result_map[perm_key][2]))
+
 
 def main():
     """
