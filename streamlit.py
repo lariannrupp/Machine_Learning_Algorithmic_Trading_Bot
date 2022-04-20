@@ -364,18 +364,18 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
 
     names = [flipped_finta_map[n] for n in ta_functions]
 
-    #this is generating all of the permutations of the ta_functions. 
-    ta_func_permutations = []
+    #this is generating all of the combinations of the ta_functions. 
+    ta_func_combinations = []
     for k in range(len(ta_functions)):
-        ta_func_permutations.extend(itertools.combinations(ta_functions, k+1))
+        ta_func_combinations.extend(itertools.combinations(ta_functions, k+1))
 
-    st.write(f"Testing {len(ta_func_permutations)} different permutations of these indicators: ", ", ".join(names))
+    st.write(f"Testing {len(ta_func_combinations)} different combinations of these indicators: ", ", ".join(names))
     
     # this is prepping the final results df    
     top_ten_results_df = pd.DataFrame(columns=["Variation", "SVM Returns", "Random Forest Returns", "Naive Bayes Returns"])
 
     # all of the results dfs should be stored in this map for future reference
-    all_permutations_result_map = {}
+    all_combinations_result_map = {}
 
     # this is really important. some of the finta functions 
     # take a long time. having a cache really speeds it up
@@ -383,7 +383,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
 
     actual_returns_for_period = None
     
-    for ta_func_permutation in ta_func_permutations:
+    for ta_func_permutation in ta_func_combinations:
 
         perm_key = ",".join(ta_func_permutation)
 
@@ -423,7 +423,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
 
         # now that all of the results are in a single dataframe, we're storing the merged_df in a map so that
         # it could possibly be referenced later to display the chart later.
-        all_permutations_result_map[_key] = merged_df        
+        all_combinations_result_map[_key] = merged_df        
 
         # the next 3 lines is a way to manually add a row to a dataframe
         top_ten_results_df.loc[-1] = [_key, svm_final_return, rf_final_return, nb_final_return]
@@ -447,7 +447,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
     
     for perm_key in top_ten_results_df["Variation"][:10]:
         st.write(f"Results for: {perm_key}")
-        st.line_chart(all_permutations_result_map[perm_key])
+        st.line_chart(all_combinations_result_map[perm_key])
    
    # Display classification report
     with st.expander("Classification Report Comparison"):
