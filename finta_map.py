@@ -78,6 +78,5 @@ finta_map = {
     'Volume Flow Indicator': 'VFI',
     'Moving Standard deviation': 'MSD',
     'Schaff Trend Cycle': 'STC'
-
 }
 

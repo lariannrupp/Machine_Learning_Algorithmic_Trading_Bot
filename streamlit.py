@@ -1,37 +1,42 @@
 import os
 import requests
-import pandas as pd
-
-import streamlit as st
-from sklearn.model_selection import train_test_split
-import numpy as np
 from pathlib import Path
+
+import pandas as pd
+from pandas.tseries.offsets import DateOffset
 import hvplot.pandas
-from sklearn import svm
+import streamlit as st
+import numpy as np
+from finta import TA # for more info: https://github.com/peerchemist/finta
+import yfinance as yf 
+
+import time
+import itertools
+import random
+from functools import reduce
+import datetime
+from collections import Counter
+
+# local imports
+from finta_map import finta_map
+
+# scalers
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-
 from sklearn.preprocessing import PowerTransformer
 from sklearn.preprocessing import QuantileTransformer
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.preprocessing import MaxAbsScaler
 
-from pandas.tseries.offsets import DateOffset
-from sklearn.metrics import classification_report
-from finta import TA
-import yfinance as yf # place this in your imports section
-# something to look into later: https://github.com/kernc/backtesting.py
-import time
-import itertools
-import random
+# models
+from sklearn.model_selection import train_test_split
+from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
-from functools import reduce
-from finta_map import finta_map
-import datetime
-from collections import Counter
+from sklearn.metrics import classification_report
+
 
 flipped_finta_map = {v: k for k, v in finta_map.items()}
 
@@ -54,7 +59,7 @@ all_ta_functions = [
     'EBBP', 'EFI', 'EMA', 'EMV', 'ER', 'EVWMA', 'EV_MACD', 'FISH', 
     'FRAMA', 'FVE', 'HMA', 'ICHIMOKU', 'IFT_RSI', 'KAMA', 'KC', 'KST', 'MACD', 
     'MFI', 'MI', 'MOBO', 'MOM', 'MSD', 'OBV', 'PERCENT_B', 'PIVOT', 'PIVOT_FIB', 
-    'PPO', 'PSAR', 'PZO', 'QSTICK', 'ROC', 'RSI', 'SAR', 'SMA', 'SMM', 'SMMA', 'SQZMI', 
+    'PPO', 'PSAR', 'PZO', 'ROC', 'RSI', 'SAR', 'SMA', 'SMM', 'SMMA', 'SQZMI', 
     'SSMA', 'STC', 'STOCH','STOCHRSI', 'TEMA', 'TP', 'TR', 
     'TRIMA', 'TRIX', 'TSI', 'UO', 'VAMA', 'VFI', 'VORTEX', 'VPT', 
     'VWAP', 'VW_MACD', 'VZO', 'WMA', 'WOBV', 'WTO', 'ZLEMA']
@@ -65,7 +70,7 @@ all_ta_functions = [
 bad_funcs = [
     'ADL', 'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 
     'IFT_RSI', 'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STC', 'STOCH', 'ADL', 
-    'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 'IFT_RSI', 
+    'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 'IFT_RSI', 'QSTICK', 
     'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STC', 'STOCH', 'UO', 'VORTEX', 'VWAP', 'WTO',
     'WILLIAMS', 'WILLIAMS_FRACTAL', 'ALMA', 'VIDYA','MAMA','LWMA','STOCHD','SWI','EFI']
 
@@ -80,7 +85,7 @@ if 'last_runs_fa_funcs' not in st.session_state:
     # This is initializing the state.
     st.session_state['last_runs_fa_funcs'] = None
 
-def getYahooStockData(ticker, years=10):
+def getYahooStockData(ticker, start_date, end_date):
     """
     Gets data from yahoo stock api. 
     Args:
@@ -89,13 +94,11 @@ def getYahooStockData(ticker, years=10):
     Return:
         Dataframe of stock data
     """
-    end_date = pd.to_datetime('today').normalize()
-    start_date =  end_date - DateOffset(years=years)
     result_df = yf.download(ticker, start=start_date,  end=end_date,  progress=False )
 
     # renaming cols to be compliant with finta
     result_df = result_df.rename(columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"})
-    
+
     # dropping un-used col
     result_df = result_df.drop(columns=["Adj Close"])
     return result_df
@@ -134,7 +137,7 @@ def makeSignalsDf(ohlcv_df):
     signals_df = signals_df.drop(columns=["open", "high", "low", "close", "volume"])
     return signals_df
 
-def executeFintaFunctions(df, ohlcv_df, ta_functions):
+def executeFintaFunctions(df, ohlcv_df, ta_functions, start_date,end_date):
     """
     Executes finta functions on a df which is passed in.
     finta reference: https://github.com/peerchemist/finta
@@ -147,7 +150,9 @@ def executeFintaFunctions(df, ohlcv_df, ta_functions):
     Args:
         df: a signals df put all of the new cols on
         ohlcv_df: the standard ohlov df
-        ta_fuctions: a list of finta functions to call.
+        ta_fuctions: a list of finta functions to call,
+        start_date: start date of the query for the sake of caching.
+        end_date: end date of the query for the sake of caching.
     Return:
         dataframe with newly appended finta data.
 
@@ -155,32 +160,34 @@ def executeFintaFunctions(df, ohlcv_df, ta_functions):
     
     for ta_function in ta_functions:
         # dynamically calling the TA function.
+        _cache_key = f"{ta_function}-{start_date}-{end_date}"
+        
         try:
-            if ta_function in finta_cache:
+            if _cache_key in finta_cache:
                 # some of these functions are expensive to re-generate. trying to do a
                 # cache here to avoid doing the same expensive calculations again and again.
-                ta_result = finta_cache[ta_function]
+                ta_result = finta_cache[_cache_key]
             else:
                 # calling the actual finta function:
-                # So here, we have the string version of the finta function name that we want
-                # to call. This is a way to call a function on an module if just have the string
-                # representation of name. the 'getattr' function will return a reference function
-                # based on the string name of the function.
+                # at this point, we have the string version of the finta function name that we want
+                # to call. The getattr() function is a way to get a reference to function on an
+                # module if just have the string representation of name. 
                 #
                 # for example, if we are trying to call the TA.sma() function, at this point we
-                # have the 'sma' store as the 'ta_function'. that means that this getattr is
-                # returning a reference to TA.sma() without actually calling it, and then storing
-                # is as the finta_func variable, which we can then excute on the following line
-                # with the ohlcv_df that is necessary to call it.
+                # will have the 'ta_function' variable with the value of 'sma'. given that, if we call
+                # `finata_func = getattr(TA, ta_function)`, it will return a reference to TA.sma()
+                # without actually calling it, and then store it as the finta_func variable. From
+                # there, we can then excute it on the following line with the ohlcv_df that is
+                # necessary to call it.
                 finta_func = getattr(TA, ta_function)
                 ta_result = finta_func(ohlcv_df)
 
-                finta_cache[ta_function] = ta_result
+                finta_cache[_cache_key] = ta_result
 
             # finta functions results vary in terms of data type. Sometimes, it will return
             # a single column of data stored in a panada series. Other times, like with Bollinger
             # bands, it will return three seperate columns of data inside a panda dataframe.
-            # this next bit detects what finta returns, and then adds the columns accordingly.
+            # this next bit detects what finta returned, and then adds the columns accordingly.
             if isinstance(ta_result, pd.Series):
                 df[ta_function] = ta_result
             elif isinstance(ta_result, pd.DataFrame):
@@ -227,12 +234,6 @@ def createScaledTestTrainData(df, indicators, scaler_name):
     elif scaler_name == 'RobustScaler':
         scaler = RobustScaler()
 
-    # Apply the scaler model to fit the X-train data
-    #X_scaler = scaler.fit(X_train)
-    # Transform the X_train and X_test DataFrames using the X_scaler
-    #X_train_scaled = X_scaler.transform(X_train)
-    #X_test_scaled = X_scaler.transform(X_test)
-
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.fit_transform(X_test)
     
@@ -257,13 +258,6 @@ def executeSVMModel(X_train_scaled, X_test_scaled, y_train, y_test, signals_df )
     pred = model.predict(X_test_scaled)
     testing_report = classification_report(y_test, pred, output_dict=True)
 
-    #st.write(X_test_scaled)
-    #if len(np.unique(pred)) == 1:
-    #st.write(">>> hit pred count:", pred)
-    #st.write(Counter(pred).keys())
-    #st.write(Counter(pred).values())    
-    
-    
     predictions_df = pd.DataFrame(index=y_test.index)
     # Add the SVM model predictions to the DataFrame
     predictions_df['Predicted'] = pred
@@ -288,8 +282,7 @@ def executeRandomForest(X_train_scaled, X_test_scaled, y_train, y_test, signals_
     Return:
         tuple(predictions_df, testing_report)
     """
-    #rf_model = RandomForestClassifier(n_estimators=100)
-    rf_model = RandomForestClassifier()
+    rf_model = RandomForestClassifier(random_state=10)
     rf_model = rf_model.fit(X_train_scaled, y_train)
     pred = rf_model.predict(X_test_scaled)
     testing_report = classification_report(y_test, pred, output_dict=True)
@@ -367,7 +360,7 @@ def executeNaiveBayes(X_train_scaled, X_test_scaled, y_train, y_test, signals_df
     return predictions_df, report
 
 
-def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
+def execute(ticker, scaler, start_date, end_date, indicators_to_use=[], rerun=False):
     """
     This is the main data gathering for this app. It will call other functions
     to assemble a main dataframe which can be used in different ways.
@@ -387,7 +380,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
         return results
 
     # Getting the stock data
-    ohlcv_df = getYahooStockData(ticker.upper(), years)
+    ohlcv_df = getYahooStockData(ticker.upper(), start_date, end_date)
 
     #prepping the stock data
     ohlcv_df = prepDf(ohlcv_df)
@@ -424,15 +417,15 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
 
     actual_returns_for_period = None
     
-    for ta_func_permutation in ta_func_combinations:
+    for ta_func_combination in ta_func_combinations:
 
-        perm_key = ",".join(ta_func_permutation)
+        perm_key = ",".join(ta_func_combination)
 
         # it's lame to do this every time, but I've experienced so many reference errors with not
         # trying to re-instiate this every loop. Yes, it's lame, but this is a bit more garenteed
         # to work.
         signals_df = makeSignalsDf(ohlcv_df)
-        finta_signals_df, indicators = executeFintaFunctions(signals_df, ohlcv_df, ta_func_permutation)
+        finta_signals_df, indicators = executeFintaFunctions(signals_df, ohlcv_df, ta_func_combination, start_date, end_date)
 
         X_train_scaled, X_test_scaled, y_train, y_test = createScaledTestTrainData(finta_signals_df, indicators, scaler)
 
@@ -465,7 +458,7 @@ def execute(ticker, scaler, indicators_to_use=[], years=10, rerun=False):
         dfs_to_merge = [svm_final_df, rf_final_df,  ad_final_df, nb_final_df]
         merged_df = reduce(lambda left,right: pd.merge(left,right,left_index=True, right_index=True), dfs_to_merge)
        
-        _key = ",".join([flipped_finta_map[n] for n in ta_func_permutation])
+        _key = ",".join([flipped_finta_map[n] for n in ta_func_combination])
 
         # fixme - it's lame to have to reset this every iteration
         actual_returns_for_period = svm_final_df.iloc[-1]["Actual Returns"]
@@ -524,7 +517,7 @@ def main():
    
     st.title("Technical Indicator Analysis with ML")
 
-    st.sidebar.info( "Select the criteria to run:")
+    #st.sidebar.info( "Select the criteria to run:")
 
     # reversing this again
     valid_indicators = {v: k for k, v in flipped_finta_map.items()}
@@ -536,29 +529,31 @@ def main():
     
     selected_stock = st.sidebar.text_input("Choose a stock:", value="SPY")
     selected_scaler = st.sidebar.selectbox("Choose a Scaler:", all_scalers)
+
+    today = pd.to_datetime('today').normalize()
+    
+    start_date = st.sidebar.date_input("Start Date", value=(today - DateOffset(years=10)), max_value=today)
+    end_date = st.sidebar.date_input("End Date", max_value=today)    
     
     st.sidebar.markdown("---")    
     named_selected_indicators = st.sidebar.multiselect("TA Indicators to use:", valid_indicator_names)
 
     selected_indicators = []
 
-    # It would be interesting to play with date ranges. 
-    # selected_years = st.sidebar.slider("Number of years of data", min_value=1, max_value=10, value=10)
-    selected_years = 10
-    
     for named_indicator in named_selected_indicators:
         selected_indicators.append(valid_indicators[named_indicator])
 
     if st.sidebar.button("Run"):
-        with st.spinner('Executing...'):        
-            execute(selected_stock, selected_scaler, selected_indicators, selected_years)
+        with st.spinner('Executing...'):
+            st.write(start_date)
+            execute(selected_stock, selected_scaler, start_date, end_date, selected_indicators)
     st.sidebar.markdown("---")
     st.sidebar.write("This will randomly choose 5 indicators")
     if st.sidebar.button("I'm feeling lucky"):
         with st.spinner('Executing...'):
-            execute(selected_stock, selected_scaler)
+            execute(selected_stock, selected_scaler, start_date, end_date)
     if st.sidebar.button("Re-run last"):
         with st.spinner('Executing...'):
-            execute(selected_stock, selected_scaler, [],10, True)
+            execute(selected_stock, selected_scaler, start_date, end_date, [], True)
         
 main()
