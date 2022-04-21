@@ -10,7 +10,7 @@
 
 The purpose of the project is to create a streamlit dashboard, which, given a specific stock, performs a comparative analysis of machine-learning model design in a testing environment. 
 
-Our MVP demonstrates the framework for a more powerful terminal that could potentially take a stock and design a machine learning model for it. 
+The dashboard demonstrates the framework for a more powerful terminal that could potentially take a stock and design a machine learning model for it. 
 
 
 
