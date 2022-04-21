@@ -18,7 +18,7 @@ import datetime
 from collections import Counter
 
 # local imports
-from finta_map import finta_map
+import finta_helper
 
 # scalers
 from sklearn.preprocessing import StandardScaler
@@ -37,9 +37,6 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report
 
-
-flipped_finta_map = {v: k for k, v in finta_map.items()}
-
 # The wide option will take up the entire screen.
 st.set_page_config(page_title="Technical Analysis Machine Learning",layout="wide")
 # this is change the page so that it will take a max with of 1200px, instead
@@ -50,36 +47,8 @@ st.markdown(
 )
 finta_cache = {}
 
-
-# these are all of the signal indicators provided ba finta. For reference:
-# https://github.com/peerchemist/finta
-all_ta_functions = [
-    'ADL', 'ADX', 'AO', 'APZ', 'ATR', 'BASP', 'BASPN', 'BBANDS', 'BBWIDTH', 
-    'BOP', 'CCI', 'CFI', 'CHAIKIN', 'CHANDELIER', 'CMO', 'COPP', 'DEMA', 'DMI', 'DO', 
-    'EBBP', 'EFI', 'EMA', 'EMV', 'ER', 'EVWMA', 'EV_MACD', 'FISH', 
-    'FRAMA', 'FVE', 'HMA', 'ICHIMOKU', 'IFT_RSI', 'KAMA', 'KC', 'KST', 'MACD', 
-    'MFI', 'MI', 'MOBO', 'MOM', 'MSD', 'OBV', 'PERCENT_B', 'PIVOT', 'PIVOT_FIB', 
-    'PPO', 'PSAR', 'PZO', 'ROC', 'RSI', 'SAR', 'SMA', 'SMM', 'SMMA', 'SQZMI', 
-    'SSMA', 'STC', 'STOCH','STOCHRSI', 'TEMA', 'TP', 'TR', 
-    'TRIMA', 'TRIX', 'TSI', 'UO', 'VAMA', 'VFI', 'VORTEX', 'VPT', 
-    'VWAP', 'VW_MACD', 'VZO', 'WMA', 'WOBV', 'WTO', 'ZLEMA']
-
-# So a bunch of these aren't good. I haven't verified every one of these, but it seems
-# like they have very large numbers with large ranges, which means they don't scale well.
-# and if they can't scale, they just throw off the data.
-bad_funcs = [
-    'ADL', 'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 
-    'IFT_RSI', 'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STC', 'STOCH', 'ADL', 
-    'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 'IFT_RSI', 'QSTICK', 
-    'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STC', 'STOCH', 'UO', 'VORTEX', 'VWAP', 'WTO',
-    'WILLIAMS', 'WILLIAMS_FRACTAL', 'ALMA', 'VIDYA','MAMA','LWMA','STOCHD','SWI','EFI']
-
-# Subtracting the known bad functions to make a clearer list
-for bad_func in bad_funcs:
-    if bad_func in all_ta_functions:
-        all_ta_functions.remove(bad_func)
-        if bad_func in flipped_finta_map:
-            del flipped_finta_map[bad_func]
+finta_working_funcs = finta_helper.getWorkingFunctions()
+finta_funcs_to_names_map = finta_helper.getFuncsToNamesMap()
 
 if 'last_runs_fa_funcs' not in st.session_state:
     # This is initializing the state.
@@ -385,7 +354,7 @@ def execute(ticker, scaler, start_date, end_date, indicators_to_use=[], rerun=Fa
     #prepping the stock data
     ohlcv_df = prepDf(ohlcv_df)
 
-    ta_functions = random.choices(all_ta_functions, k=5)
+    ta_functions = random.choices(finta_working_funcs, k=5)
     if indicators_to_use:
         ta_functions = indicators_to_use
     elif rerun == True:
@@ -393,7 +362,7 @@ def execute(ticker, scaler, start_date, end_date, indicators_to_use=[], rerun=Fa
         
     st.session_state['last_runs_fa_funcs'] = ta_functions
 
-    names = [flipped_finta_map[n] for n in ta_functions]
+    names = [finta_funcs_to_names_map[n] for n in ta_functions]
 
     #this is generating all of the combinations of the ta_functions. 
     ta_func_combinations = []
@@ -458,7 +427,7 @@ def execute(ticker, scaler, start_date, end_date, indicators_to_use=[], rerun=Fa
         dfs_to_merge = [svm_final_df, rf_final_df,  ad_final_df, nb_final_df]
         merged_df = reduce(lambda left,right: pd.merge(left,right,left_index=True, right_index=True), dfs_to_merge)
        
-        _key = ",".join([flipped_finta_map[n] for n in ta_func_combination])
+        _key = ",".join([finta_funcs_to_names_map[n] for n in ta_func_combination])
 
         # fixme - it's lame to have to reset this every iteration
         actual_returns_for_period = svm_final_df.iloc[-1]["Actual Returns"]
@@ -520,7 +489,7 @@ def main():
     #st.sidebar.info( "Select the criteria to run:")
 
     # reversing this again
-    valid_indicators = {v: k for k, v in flipped_finta_map.items()}
+    valid_indicators = {v: k for k, v in finta_funcs_to_names_map.items()}
 
     valid_indicator_names = valid_indicators.keys()
 
@@ -545,7 +514,6 @@ def main():
 
     if st.sidebar.button("Run"):
         with st.spinner('Executing...'):
-            st.write(start_date)
             execute(selected_stock, selected_scaler, start_date, end_date, selected_indicators)
     st.sidebar.markdown("---")
     st.sidebar.write("This will randomly choose 5 indicators")

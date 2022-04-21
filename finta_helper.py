@@ -1,4 +1,8 @@
-finta_map = {
+# these are all of the signal indicators provided ba finta. For reference:
+# https://github.com/peerchemist/finta
+
+# there are all of the finta functions that they currently off taken from their site.
+master_finta_map = {
     'Simple Moving Average': 'SMA',
     'Simple Moving Median': 'SMM',
     'Smoothed Simple Moving Average': 'SSMA',
@@ -80,3 +84,60 @@ finta_map = {
     'Schaff Trend Cycle': 'STC'
 }
 
+# these are a bunch of functions that really don't scale well. They probably could work
+# with some effort, but running out of time.
+bad_funcs = [
+    'ADL', 'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 
+    'IFT_RSI', 'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STC', 'STOCH', 'ADL', 
+    'ADX', 'ATR', 'BBWIDTH', 'BOP', 'CHAIKIN', 'COPP', 'EFI', 'EMV', 'EV_MACD', 'IFT_RSI', 'QSTICK', 
+    'MFI', 'MI', 'MSD', 'OBV', 'PSAR', 'ROC', 'SQZMI', 'STOCH', 'UO', 'VORTEX', 'VWAP', 'WTO',
+    'WILLIAMS', 'WILLIAMS_FRACTAL', 'ALMA', 'VIDYA','MAMA','LWMA','STOCHD','SWI','EFI']
+
+def getWorkingFunctions():
+    """
+    Returns a list of working finta functions.
+
+    Returns:
+       list of supported finta functions
+    """
+    working_finta_functions = list(master_finta_map.values())
+    for bad_func in bad_funcs:
+        if bad_func in working_finta_functions:
+            working_finta_functions.remove(bad_func)
+    return working_finta_functions
+
+
+def getFuncsToNamesMap():
+    """
+    Returns a map of finta functions to their proper names
+
+    Returns:
+       dict of finta function names to proper names
+
+    """
+    result = {}
+    flipped_master = {v: k for k, v in master_finta_map.items()}
+    
+    working_funcs = getWorkingFunctions()
+   
+    for func in working_funcs:
+        result[func] = flipped_master[func]
+    result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1])}
+        
+    return result
+
+def getNamesToFuncsMap():
+    """
+    Returns a map of finta proper name to their functions
+
+    Returns:
+       dict of finta proper name to their functions
+    """
+    funcs_to_names = getFuncsToNamesMap()
+    return {v: k for k, v in funcs_to_names.items()}        
+
+
+
+
+
+        
