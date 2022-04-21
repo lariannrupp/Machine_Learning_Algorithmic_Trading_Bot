@@ -8,7 +8,9 @@
 ---
 ## Purpose: 
 
-Before starting their algorithmic trading project or purchasing a trading bot from an online marketplace, a user can launch this app to select a stock and compare machine learning models and technical indicators in a generic testing environment. 
+The purpose of the project is to create a streamlit dashboard, which, given a specific stock, performs a comparative analysis of machine-learning model design in a testing environment. 
+
+Our MVP demonstrates the framework for a more powerful terminal that could potentially take a stock and design a machine learning model for it. 
 
 
 
@@ -26,7 +28,7 @@ The app is deployed to a Streamlit interface, so to use the app, no installation
 
 The data undergoes a standard train, fit, predit process with the training window being 6 years, and the testing window being 4 years. 
 
-By default, the app scales X feature with StandardScaler(), but within the app, the user can test out different data scaling methods. 
+By default, the app scales X features with StandardScaler(), but within the app, the user can test out different data scaling methods. 
 
 ---
 
