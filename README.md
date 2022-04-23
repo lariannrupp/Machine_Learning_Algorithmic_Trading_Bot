@@ -18,7 +18,10 @@ The dashboard demonstrates the framework for a more powerful terminal that could
 
 ## Installation Guide
 
-The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README.md
+The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README.
+
+To run it from local computer, clone repo. From the Terminal, activate conda envirnoment; change directory to repo folder,
+and type "streamlit run streamlit.py". This will launch a web browser with a local URL: http://localhost:8501.
 
 ---
 
@@ -48,7 +51,7 @@ The following machine learning models were selected because they are common, sup
 
 ## Approach
 
-The user can test combinations of up to 54 technical indicators. However, testing all 54 indicators at once would take a long time and a personal computer may not have the power for this request. We suggest using 5 indicators, which results in 31 possible combinations (i.e., each indicator by itself, all 5 indicators together, and all combinations of 2, 3, and 4 indicators). Then, the top 10 best-performing combinations are displayed. 
+The user can test combinations of up to 54 technical indicators. However, testing all 54 indicators at once would take a long time and a personal computer may not have the power for this request. We recommend using 5 indicators, which results in 31 possible combinations (i.e., each indicator by itself, all 5 indicators together, and all combinations of 2, 3, and 4 indicators). Then, the top 10 best-performing combinations are displayed. 
 
 For users who would like to explore combinations of a random 5 indicators, they can use the **I'm feeling lucky** button. 
 
@@ -89,7 +92,10 @@ Lari Rupp
 
 
 ### Collaborators
-University of California Berkelely Fintech Bootcamp (Project 2, 2022),
+
+University of California Berkelely Fintech Bootcamp (Project 2, 2022)
+
+Trilogy Education LLC.
 
 Kevin Lee (Instructor)
 
