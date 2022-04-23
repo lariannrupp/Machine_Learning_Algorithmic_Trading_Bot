@@ -27,7 +27,7 @@ master_finta_map = {
     'Elastic-Volume weighted MACD': 'EV_MACD',
     'Market Momentum': 'MOM',
     'Rate-of-Change': 'ROC',
-    'Relative Strenght Index': 'RSI',
+    'Relative Strength Index': 'RSI',
     'Inverse Fisher Transform RSI': 'IFT_RSI',
     'True Range': 'TR',
     'Average True Range': 'ATR',

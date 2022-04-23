@@ -24,9 +24,9 @@ The app is deployed to a Streamlit interface, so to use the app, no installation
 
 ## Data
 
-10 years of OHLVC (open, high, low, volume, close) stock data is pulled from the Yahoo Finance API. 
+OHLVC (open, high, low, volume, close) stock data is pulled from the Yahoo Finance API. You can choose a start date and an end date to analyze.
 
-The data undergoes a standard train, fit, predit process with the training window being 6 years, and the testing window being 4 years. 
+The data undergoes a standard train, fit, predit process with the training window being 60% of the data, and the testing window being 40% of the data. 
 
 By default, the app scales X features with StandardScaler(), but within the app, the user can test out different data scaling methods. 
 
@@ -48,11 +48,11 @@ The following machine learning models were selected because they are common, sup
 
 ## Approach
 
-The user can test combinations of up to 5 technical indicators. Of the 31 possible combinations, the top 10 are displayed. 
+The user can test combinations of up to 54 technical indicators. However, testing all 54 indicators at once would take a long time and a personal computer may not have the power for this request. We suggest using 5 indicators, which results in 31 possible combinations (i.e., each indicator by itself, all 5 indicators together, and all combinations of 2, 3, and 4 indicators). Then, the top 10 best-performing combinations are displayed. 
 
-For users who would like to explore random combinations of 5 indicators, they can use the **I'm feeling lucky** button. 
+For users who would like to explore combinations of a random 5 indicators, they can use the **I'm feeling lucky** button. 
 
-The **Re-run last** button allows the user to select a different scaler and make comparisons from testing the same indicators on the last run.
+The **Re-run last** button allows the user to select a different scaler, for example, and make comparisons by testing the same indicators from the last run.
 
 
 ---
