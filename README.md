@@ -1,17 +1,18 @@
 ![Boom-Bull-Stock-Exchange-Bear-World-Economy-913982](https://user-images.githubusercontent.com/95719899/164332595-9cf0e024-aab1-4d3b-a11c-8c47ee122b9e.jpg)
 
 ---
-# Machine_Learning_Algorithmic_Trading_Bot
+
+# Machine_Learning_Algorithmic_Technical_Indicator_Analysis
 
 **LAUNCH APP**: https://share.streamlit.io/lariannrupp/machine_learning_algorithmic_trading_bot/main/streamlit.py
 
 ---
+
 ## Purpose: 
 
-The purpose of the project is to create a streamlit dashboard, which, given a specific stock, performs a comparative analysis of machine-learning model design in a testing environment. 
+The purpose of the Project is to create a streamlit dashboard; which given a specific stock, performs a comparative analysis of machine-learning model design in a testing environment. It is called the "Technical Indicator Analysis with ML".
 
-The dashboard demonstrates the framework for a more powerful terminal that could potentially take a stock and design a machine learning model for it. 
-
+The dashboard demonstrates the framework for a more powerful terminal that can take a stock and design a machine learning model for it. 
 
 
 ---
@@ -51,11 +52,19 @@ The following machine learning models were selected because they are common, sup
 
 ## Approach
 
-The user can test combinations of up to 54 technical indicators. However, testing all 54 indicators at once would take a long time and a personal computer may not have the power for this request. We recommend using 5 indicators, which results in 31 possible combinations (i.e., each indicator by itself, all 5 indicators together, and all combinations of 2, 3, and 4 indicators). Then, the top 10 best-performing combinations are displayed. 
+The User can test combinations of up to 54 technical indicators. However, testing all 54 indicators at once would take a long time and a personal computer may not have the power for this request. We recommend using 5 indicators, which results in 31 possible combinations (i.e., each indicator by itself, all 5 indicators together, and all combinations of 2, 3, and 4 indicators). Then, the top 10 best-performing combinations are displayed. 
 
 For users who would like to explore combinations of a random 5 indicators, they can use the **I'm feeling lucky** button. 
 
 The **Re-run last** button allows the user to select a different scaler, for example, and make comparisons by testing the same indicators from the last run.
+
+Dashboard: Select parameters to perform Technical Indicator Analysis with ML.
+
+<img width="170" alt="Dashboard" src="https://user-images.githubusercontent.com/93550651/164949541-0af2877d-d77c-4679-b9f8-e771067527d4.png">
+
+Results appear as follows:
+
+<img width="716" alt="Dashboard Results" src="https://user-images.githubusercontent.com/93550651/164949764-575de6ee-9724-456e-a55f-8f10ec259a68.png">
 
 
 ---
