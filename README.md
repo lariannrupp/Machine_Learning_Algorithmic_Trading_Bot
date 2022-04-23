@@ -44,8 +44,6 @@ The following machine learning models were selected because they are common, sup
 
 - AdaBoost 
 
-- Decision Tree
-
 ---
 
 ## Approach
@@ -54,7 +52,7 @@ The user can test combinations of up to 5 technical indicators. Of the 31 possib
 
 For users who would like to explore random combinations of 5 indicators, they can use the **I'm feeling lucky** button. 
 
-The **Re-run last** button allows the user the rerun the app observe how the random forest model performs with each iteration.
+The **Re-run last** button allows the user to select a different scaler and make comparisons from testing the same indicators on the last run.
 
 
 ---
