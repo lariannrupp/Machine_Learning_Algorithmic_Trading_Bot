@@ -18,7 +18,7 @@ The dashboard demonstrates the framework for a more powerful terminal that could
 
 ## Installation Guide
 
-The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README. 
+The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README.md
 
 ---
 
