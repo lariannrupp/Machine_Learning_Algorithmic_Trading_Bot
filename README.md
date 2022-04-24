@@ -22,7 +22,7 @@ The dashboard demonstrates the framework for a more powerful terminal that can t
 The app is deployed to a Streamlit interface, so to use the app, no installation is required. Simply launch the link at the top of the README.
 
 To run it from local computer, clone repo. From the Terminal, activate conda envirnoment; change directory to repo folder,
-and type "streamlit run streamlit.py". This will launch a web browser with a local URL: http://localhost:8501.
+and type `streamlit run streamlit.py`. This will launch a web browser with a local URL such as http://localhost:8501. *Note that you will need to install some libraries/dependencies if you do not already have them. You can do so by typing `pip install requirements.txt` into the terminal.* 
 
 ---
 
